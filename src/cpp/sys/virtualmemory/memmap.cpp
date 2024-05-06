@@ -246,7 +246,12 @@ void map_kernel_impl(PageTable *table, void *base_address, bool map) {
 
             v += PAGE_FRAME_SIZE;
             start += PAGE_FRAME_SIZE;
+
+            // kprintln("On loop:");
+            // kspit(v);
+            // kspit(start);
         }
+
         return v;
     };
 
@@ -318,10 +323,12 @@ void identity_unmap_kernel(PageTable *table) {
 
 void end_map_kernel(PageTable *table) {
     size_t kernel_size = reinterpret_cast<byte *>(&_stack_end) - reinterpret_cast<byte *>(&_text_start);
-    uintptr_t address = 0;
-    address = address - 0x40000000;
-    void *vaddress = to_ptr(address);
-    map_kernel_impl(table, vaddress, true);
+    kdebug("Kernel size in bytes: {}", kernel_size);
+    kdebug("Highest address {}", HIGHEST_ADDRESS);
+    byte *highest_address = reinterpret_cast<byte *>(HIGHEST_ADDRESS);
+    highest_address = reinterpret_cast<byte *>(align_back(highest_address - kernel_size, PAGE_FRAME_SIZE));
+
+    map_kernel_impl(table, highest_address, true);
 }
 
 bool is_address_mapped(PageTable *table, void *vaddress) {
