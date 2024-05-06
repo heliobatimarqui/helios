@@ -59,7 +59,7 @@ void *get_kernel_begin_address() {
 }
 
 void *get_kernel_end_address() {
-    return &_heap_start;
+    return &_kernel_end;
 }
 
 void enable_address_translation(const PageTable *table) {
