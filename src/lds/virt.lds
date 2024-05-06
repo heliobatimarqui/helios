@@ -10,34 +10,45 @@ MEMORY
 
 PHDRS
 {
-  	text PT_LOAD;
-  	data PT_LOAD;
-  	bss PT_LOAD;
+	btext 	PT_LOAD;
+	bdata 	PT_LOAD;
+	bbss 	PT_LOAD;	
+  	text 	PT_LOAD;
+  	data 	PT_LOAD;
+  	bss 	PT_LOAD;
+	
 }
 
 SECTIONS
 {
-	.boot.text : {
-		*(.boot.text.init) *(.boot.text .boot.text.*)
+	.text : {
+		*(.text.boot)
 	}
+
+	.btext : {
+		*(.btext.init) 
+		*(.btext .btext.*)
+	}>ram AT>ram :btext
 	
 	PROVIDE(_bglobal_pointer = .);
 	
-	.boot.rodata : {
-		*(.boot.rodata .boot.rodata.*)
-	}
+	.brodata : {
+		*(.brodata .brodata.*)
+	}>ram AT>ram :btext
 
-	.boot.data : {
-    	*(.boot.sdata .boot.sdata.*) *(.boot.data .boot.data.*)
-	}
+	.bdata : {
+    	*(.bsdata .bsdata.*) 
+		*(.bdata .bdata.*)
+	}>ram AT>ram :bdata
 
-	.boot.bss : {
+	.bbss : {
 		. = ALIGN(8);
 		PROVIDE(_bbss_begin = .);
-    	*(.boot.sbss .boot.sbss.*) *(.boot.bss .boot.bss.*)
+    	*(.bsbss .bsbss.*) 
+		*(.bbss .bbss.*)
 		. = ALIGN(16);
 		PROVIDE(_bbss_end = .);
-  	}
+  	}>ram AT>ram :bbss
 	
 	PROVIDE(_bstack_start = _bbss_end);
 	PROVIDE(_bstack_end = _bstack_start + 0x80000);
@@ -48,7 +59,8 @@ SECTIONS
 		. = ALIGN(4096);
 		PROVIDE(_kernel_begin = .);
     	PROVIDE(_text_start = .);
-    	*(.text.init) *(.text .text.*)
+    	*(.text.init)
+		*(.text .text.*)
 		. = ALIGN(4096);
     	PROVIDE(_text_end = .);
   	} >ram AT>ram :text

@@ -216,7 +216,6 @@ void kmunmap(const void *vaddress, PageTable *start_table) {
         for (size_t i = (size_t)(current_page_level); i < sizeof(table_path) / sizeof(PageTable *); ++i) {
             auto checked_table = table_path[i];
             if (freed_last) {
-                size_t j = get_page_entry_index((PageLevel)(i), vaddress);
                 auto &entry = checked_table->get_entry(get_page_entry_index((PageLevel)(i), vaddress));
                 entry.erase();
             }
@@ -322,7 +321,6 @@ void identity_unmap_kernel(PageTable *table) {
 }
 
 void end_map_kernel(PageTable *table) {
-    size_t kernel_size = reinterpret_cast<byte *>(&_stack_end) - reinterpret_cast<byte *>(&_text_start);
     void *vaddress = to_ptr(uintptr_t(0) - uintptr_t(0x40000000));
     map_kernel_impl(table, vaddress, true);
 }
