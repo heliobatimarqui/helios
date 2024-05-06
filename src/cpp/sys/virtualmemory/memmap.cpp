@@ -323,12 +323,8 @@ void identity_unmap_kernel(PageTable *table) {
 
 void end_map_kernel(PageTable *table) {
     size_t kernel_size = reinterpret_cast<byte *>(&_stack_end) - reinterpret_cast<byte *>(&_text_start);
-    kdebug("Kernel size in bytes: {}", kernel_size);
-    kdebug("Highest address {}", HIGHEST_ADDRESS);
-    byte *highest_address = reinterpret_cast<byte *>(HIGHEST_ADDRESS);
-    highest_address = reinterpret_cast<byte *>(align_back(highest_address - kernel_size, PAGE_FRAME_SIZE));
-
-    map_kernel_impl(table, highest_address, true);
+    void *vaddress = to_ptr(uintptr_t(0) - uintptr_t(0x40000000));
+    map_kernel_impl(table, vaddress, true);
 }
 
 bool is_address_mapped(PageTable *table, void *vaddress) {
